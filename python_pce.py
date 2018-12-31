@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import pce_linkstate
+import linkstate_socksrv
 
 
 def main():
     '''simple PCE for FRRouting'''
 
-    pce_linkstate.lsocket()
+    linkstate_socksrv.lsocket()
 
     return 0
 

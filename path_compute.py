@@ -3,7 +3,7 @@
 
 import sqlite3
 import json
-import pce_segmentlist.py
+import segmentlist_sockcli
 
 
 def cspf(addr):
@@ -14,11 +14,15 @@ def cspf(addr):
 
     return segment_lists
 
+def get_ted():
+
 
 def compute(addr):
     '''computing cspf'''
 
+    linkstate = get_ted()
+    policy = get_policy(addr)
     segment_lists = cspf(addr)
-    pce_segmentlist.ssocket(addr, segment_lists)
+    segmentlist_sockcli.ssocket(addr, segment_lists)
 
     return

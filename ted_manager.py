@@ -1,44 +1,24 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import sqlite3
 import path_compute
 
-DBPATH = './ted.sqlite'
 
+def check_ted(linkstate, addr):
+    '''check TED'''
+    with open('dat/ted.json', 'w') as f:
+        ted = json.loads(f)
 
-def checkdb(linkstate, addr):
-    '''check DB'''
-
-    conn = sqlite3.connect(DBPATH)
-    cur = conn.cursor()
-    linkstate_pattern = 'SELECT * FROM ted WHERE ip = ' + \
-        linkstate['addr'] + ' AND  router-id = ' + \
-        linkstate['router-id'] + ' AND label = ' + linkstate['label']
-
-    exist = cur.execute('SELECT * FROM ted WHERE EXISTS ip = ' + linkstate['addr'])
-    rslt = cur.execute(linkstate_pattern)
-    if exist == False:
-        return -1
-    else if rslt != '':
+    if linkstate == ted:
         return 0
-    else:  # diffあり
-        return 1
+    else:
+        return -1
 
 
-def insertdb(linkstate, addr):
-    '''insert DB'''
-
-
-def updatedb(linkstate, addr):
-    '''update DB'''
-
-    return
-
-
-def pc_request(addr):
-    '''request to path_compute'''
-    path_compute.compute(addr)
+def update_ted(linkstate, addr):
+    '''update TED'''
+    with open('dat/ted.json', 'w') as f:
+        json.dumps(linkstate, f)
 
     return
 
@@ -46,13 +26,9 @@ def pc_request(addr):
 def manager(addr, linkstate):
     '''main of TED manager'''
 
-    ret = checkdb(linkstate, addr)
+    ret = check_ted(linkstate, addr)
     if ret != 0:
-        if ret == -1:
-            insertdb(linkstate, addr):
-        else:
-            updatedb(linkstate, addr):
-
-        pc_request(addr):
+        update_ted(linkstate, ted);
+        path_compute.compute(addr)
 
     return
