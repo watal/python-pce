@@ -35,6 +35,7 @@ def lsocket():
 
         if pid == 0:
             # child process
+            s.close()
             while True:
                 data = conn.recv(BUFSIZE)
                 if not data:
