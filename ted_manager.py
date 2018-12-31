@@ -2,20 +2,21 @@
 # -*- coding:utf-8 -*-
 
 import sqlite3
+import path_compute
 
 DBPATH = './ted.sqlite'
 
 
-def checkdb(lsdb, ip):
+def checkdb(lsdb, addr):
     '''check DB'''
 
     conn = sqlite3.connect(DBPATH)
     cur = conn.cursor()
     lsdb_pattern = 'SELECT * FROM ted WHERE ip = ' + \
-        lsdb['ip'] + ' AND  router-id = ' + \
+        lsdb['addr'] + ' AND  router-id = ' + \
         lsdb['router-id'] + ' AND label = ' + lsdb['label']
 
-    exist = cur.execute('SELECT * FROM ted WHERE EXISTS ip = ' + lsdb['ip'])
+    exist = cur.execute('SELECT * FROM ted WHERE EXISTS ip = ' + lsdb['addr'])
     rslt = cur.execute(lsdb_pattern)
     if exist == False:
         return -1
@@ -25,35 +26,36 @@ def checkdb(lsdb, ip):
         return 1
 
 
-def insertdb():
+def insertdb(lsdb, addr):
     '''insert DB'''
 
 
-def updatedb():
+def updatedb(lsdb, addr):
     '''update DB'''
 
     return
 
 
-def cspf_request():
-    '''request to pce_cspf'''
+def pc_request(addr):
+    '''request to path_compute'''
+    path_compute.compute(addr)
 
     return
 
 
-def manager(lsdb, ip):
+def manager(addr, lsdb):
     '''main of TED manager'''
 
-    ret = checkdb(lsdb, ip)
+    ret = checkdb(lsdb, addr)
     if ret != 0:
         if ret == -1:
             # DB作成
-            insertdb(lsdb, ip):
+            insertdb(lsdb, addr):
         else:
             # DB更新
-            updatedb(lsdb, ip):
+            updatedb(lsdb, addr):
 
                 # 計算要求
-        cspf_request(ip):
+        pc_request(addr):
 
     return
