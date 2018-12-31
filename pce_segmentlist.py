@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import socket
+import json
 
 
 class ServAttr:
@@ -18,7 +19,7 @@ def ssocket(segment_lists):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((serv.ip, serv.port))
-    s.send(segment_lists)
+    s.send(json.dumps(segment_lists))
     s.close()
 
     return
