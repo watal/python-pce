@@ -7,17 +7,17 @@ import path_compute
 DBPATH = './ted.sqlite'
 
 
-def checkdb(lsdb, addr):
+def checkdb(linkstate, addr):
     '''check DB'''
 
     conn = sqlite3.connect(DBPATH)
     cur = conn.cursor()
-    lsdb_pattern = 'SELECT * FROM ted WHERE ip = ' + \
-        lsdb['addr'] + ' AND  router-id = ' + \
-        lsdb['router-id'] + ' AND label = ' + lsdb['label']
+    linkstate_pattern = 'SELECT * FROM ted WHERE ip = ' + \
+        linkstate['addr'] + ' AND  router-id = ' + \
+        linkstate['router-id'] + ' AND label = ' + linkstate['label']
 
-    exist = cur.execute('SELECT * FROM ted WHERE EXISTS ip = ' + lsdb['addr'])
-    rslt = cur.execute(lsdb_pattern)
+    exist = cur.execute('SELECT * FROM ted WHERE EXISTS ip = ' + linkstate['addr'])
+    rslt = cur.execute(linkstate_pattern)
     if exist == False:
         return -1
     else if rslt != '':
@@ -26,11 +26,11 @@ def checkdb(lsdb, addr):
         return 1
 
 
-def insertdb(lsdb, addr):
+def insertdb(linkstate, addr):
     '''insert DB'''
 
 
-def updatedb(lsdb, addr):
+def updatedb(linkstate, addr):
     '''update DB'''
 
     return
@@ -43,19 +43,16 @@ def pc_request(addr):
     return
 
 
-def manager(addr, lsdb):
+def manager(addr, linkstate):
     '''main of TED manager'''
 
-    ret = checkdb(lsdb, addr)
+    ret = checkdb(linkstate, addr)
     if ret != 0:
         if ret == -1:
-            # DB作成
-            insertdb(lsdb, addr):
+            insertdb(linkstate, addr):
         else:
-            # DB更新
-            updatedb(lsdb, addr):
+            updatedb(linkstate, addr):
 
-                # 計算要求
         pc_request(addr):
 
     return
