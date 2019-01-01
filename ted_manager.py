@@ -6,6 +6,7 @@ import path_compute
 
 def check_ted(linkstate, addr):
     '''check TED'''
+
     with open('dat/ted.json', 'w') as f:
         ted = json.loads(f)
 
@@ -17,6 +18,7 @@ def check_ted(linkstate, addr):
 
 def update_ted(linkstate, addr):
     '''update TED'''
+
     with open('dat/ted.json', 'w') as f:
         json.dumps(linkstate, f)
 
