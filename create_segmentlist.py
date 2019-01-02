@@ -97,29 +97,52 @@ def dijkstra(src, dst, graph):
     return shortest_path
 
 
+def retour(src, dst, info_graph, constrained_path, linkstate):
+
+    retour_list = []
+
+    for i in range(len(constrained_path)):
+        # 宛先よりiノード前までが最短経路かを調べる
+        if constrained_path[:i] == dijkstra(src, constrained_path[j], info_graph):
+            # 最短が見つかったらそこまでのNode SIDをappend
+            segmentlist.append(linkstate[retour_path[:i]])
+            # 中間ノードから先が最短経路と一致しないなら
+            if constrained_path[:i] != dijkstra(src, constrained_path[j], info_graph):
+                # 中間ノードをsrcに変えてもう一度検索
+                segmentlist.append(retour(constrained_path[i], dst, info_graph. constrained_path[i:]))
+
+            else:
+                # dstまでが最短経路ならそのNodeを加えて終了
+                segmentlist.append(linkstate[constrained_path[i]][0])
+                return retour_list
+
+    # 一個前でも最短経路でないならば，そこへのAdj SIDをsegmentlistにappend
+    segmentlist.append(linkstate[src][2][constrained_path[1]])
+    # 隣接ノードがdstでないならば
+    if constrained_path[1] != dst:
+        # 一つ先からもう一度検索
+        segmentlist.append(retour(constrained_path[i], dst, info_graph. constrained_path[1:], linkstate))
+
+    return retour_list
+
 def path_verification(src, via, info_graph, linkstate):
     '''convert CSPF path to segmentlist'''
 
     segmentlist = []
 
+    # パスを経由ごとに分解し経路計算
     for i in range(len(via)):
-        # パスを経由ごとに分解し経路計算を行う
         # 制約付き，制約なしを計算し比較
         constrained_path = cspf_dijkstra(src, via[i], info_graph)
-        shortest_path = dijkstra(src, [via][i], info_graph)
-        # 制約付き最短経路が最短経路と異なる場合はNode SIDで直接指定不可．迂回路のセグメントリストを構築
+        shortest_path = dijkstra(src, via[i], info_graph)
+        # 制約付き最短経路が最短経路と異なる場合はNode SIDで直接指定不可
         if constrained_path != shortest_path:
-            # 宛先一つ前までが最短経路かを調べる，1ずつ減らす
-            # 最短が見つかったらそこまでのNode SID 見つからないなら一個前へのAdj SIDをsegmentlistにappend
-            # Nodeがさすところをsrcに買えてもう一度検索
-            # dstまでが最短経路ならそのNodeを加えて終了
-            # src == dstならbreak
-
+            # 迂回路のセグメントリストを構築し追記
+            segmentlist.append(retour(src, via[i], info_graph, constrained_path))
         else:
-            # 直接Node SIDを指定
-            segmentlist.append([linkstate[via[i]][0]])
+            # 直接Node SIDを追加
+            segmentlist.append(linkstate[via[i]][0])
 
-    # debug
     return segmentlist
 
 
@@ -144,11 +167,16 @@ def create_segmentlist():
     # Add information in graph
     info_graph = with_info_graph(graph, policy)
     # Make segmentlist
-    segmentlist = path_verification(src, via, info_graph, linkstate)
-    print(segmentlist)
+#     segmentlist = path_verification(src, via, info_graph, linkstate)
+#     '''debug
+    print('info_graph')
+    print(info_graph)
+#     print('segment_list')
+#     print(segmentlist)
+#     '''
 
-#     return segmentlist
     return 0
+#     return segmentlist
 
 
 if __name__ == '__main__':
