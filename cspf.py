@@ -10,19 +10,7 @@ def construct_lsalist(linkstate):
     lsalist = {}
 
     for i in range(len(linkstate)):
-        if linkstate[i].get('Opaque-Type') == 1:
-            # Get link information(ID, Bandwidth)
-            if not linkstate[i].get('Router-Address') in lsalist:
-                lsalist[linkstate[i].get('Router-Address')] = [0, {}]
-            if not linkstate[i].get('Link-ID') in lsalist[linkstate[i].get('Router-Address')][1]:
-                lsalist[linkstate[i].get('Router-Address')][1][linkstate[i].get('Link-ID')] = [0, 0, 0]
-
-            lsalist[linkstate[i].get('Router-Address')][1][linkstate[i].get('Link-ID')][0] \
-                = linkstate[i]['Local Interface IP Addresses'][0].get('0')
-            lsalist[linkstate[i].get('Router-Address')][1][linkstate[i].get('Link-ID')][2] \
-                = linkstate[i].get('Maximum Bandwidth')
-
-        elif linkstate[i].get('Opaque-Type') == 4:
+        if linkstate[i].get('Opaque-Type') == 4:
             # Get SRGB
             if not linkstate[i].get('Advertising Router') in lsalist:
                 lsalist[linkstate[i].get('Advertising Router')] = [0, {}]
@@ -36,15 +24,30 @@ def construct_lsalist(linkstate):
             lsalist[linkstate[i].get('Advertising Router')][0] \
                 += linkstate[i].get('Prefix SID Sub-TLV')[4].get('Index')
 
-    for i in range(len(linkstate)):
-        if linkstate[i].get('Opaque-Type') == 8:
+        elif linkstate[i].get('Opaque-Type') == 8:
             # Get Adjacency SID
+            if not linkstate[i].get('Advertising Router') in lsalist:
+                lsalist[linkstate[i].get('Advertising Router')] = [0, {}]
+            if not linkstate[i].get('Extended Link TLV')[2].get('Link ID') in lsalist[linkstate[i].get('Advertising Router')][1]:
+                lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')] = [0, 0, 0]
+
+            lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')][0]\
+            = linkstate[i].get('Extended Link TLV')[3].get('Link data')
+
+            if linkstate[i].get('Adj-SID Sub-TLV') is not None:
+                lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')][1]\
+                = linkstate[i].get('Adj-SID Sub-TLV')[4].get('Label')
+            else:
+                lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')][1]\
+                = linkstate[i].get('LAN-Adj-SID Sub-TLV')[5].get('Label')
+
+
+    for i in range(len(linkstate)):
+        if linkstate[i].get('Opaque-Type') == 1:
+            # Get link information(ID, Bandwidth)
             for j in lsalist[linkstate[i].get('Advertising Router')][1].values():
-                if linkstate[i].get('Extended Link TLV')[3].get('Link data') == j[0]:
-                    if linkstate[i].get('Adj-SID Sub-TLV') is not None:
-                        j[1] = linkstate[i].get('Adj-SID Sub-TLV')[4].get('Label')
-                    else:
-                        j[1] = linkstate[i].get('LAN-Adj-SID Sub-TLV')[5].get('Label')
+                if linkstate[i].get('Local Interface IP Addresses')[0].get('0') == [j][0][0]:
+                    [j][0][2] = linkstate[i].get('Maximum Reservable Bandwidth')
 
     return lsalist
 
@@ -58,13 +61,11 @@ def construct_graph(lsalist):
     for i in lsalist.keys():
         list_keys.append(i)
 
-    print(lsalist)
     for i in range(len(list_keys)):
         for j in range(i + 1, len(list_keys)):
-            print(list_keys[i], list_keys[j])
             for k in lsalist[list_keys[i]][1]:
                 if k in lsalist[list_keys[j]][1]:
-                    graph.append([list_keys[i], list_keys[j], k])
+                    graph.append([list_keys[i], list_keys[j], lsalist[list_keys[i]][1].get(k)[2]])
 
     return graph
 
@@ -76,22 +77,27 @@ def dijkstra(src, dst, graph):
     return shortest_path
 
 
-def isinclude(population, part):
-    '''Determine elements are included population'''
-    ptr = 0
-    for i in part:
-        if not i in population[ptr:]:
-            return False
-
-        ptr = population[ptr:].index(i) + 1
-
-    return True
-
 
 def cspf(src, dst, via, graph, policy):
     ''''''
-    close_list = dijkstra(src, dst, graph)
+#     close_list = dijkstra(src, dst, graph)
 
+    shortest_path = graph
+
+    return shortest_path
+
+#
+# def isinclude(population, part):
+#     '''Determine elements are included population'''
+#     ptr = 0
+#     for i in part:
+#         if not i in population[ptr:]:
+#             return False
+#
+#         ptr = population[ptr:].index(i) + 1
+#
+#     return True
+#
 
 def path_verification():
     pass
@@ -122,15 +128,21 @@ def create_segmentlist():
     with open('dat/ted.json', 'r') as f:
         linkstate = json.load(f)
     src = '192.168.0.1'
+    dst = '192.168.0.5'
     via = ['192.168.0.2', '192.168.0.3', '192.168.0.4', '192.168.0.5']
+    # BW, avoidnode
+    policy = [10, ['192.168.0.2']]
     '''debug'''
 
     # Linkstate list from TED
     lsalist = construct_lsalist(linkstate)
     # Make graph for Dijkstra [nodeA, nodeB, cost, ...]
     graph = construct_graph(lsalist)
-    print(graph)
-#     segmentlist = create_segmentlist(src, via, graph)
+    # Make shortestpath
+    shortest_path = cspf(src, dst, via, graph, policy)
+    print(shortest_path)
+    # Make segmentlist
+#     segmentlist = path_verification(src, via, graph,)
 
 #     return segmentlist
     return 0
