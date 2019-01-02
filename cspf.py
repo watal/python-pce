@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import json
+import math
 
 
 def construct_lsalist(linkstate):
@@ -29,25 +30,26 @@ def construct_lsalist(linkstate):
             if not linkstate[i].get('Advertising Router') in lsalist:
                 lsalist[linkstate[i].get('Advertising Router')] = [0, {}]
             if not linkstate[i].get('Extended Link TLV')[2].get('Link ID') in lsalist[linkstate[i].get('Advertising Router')][1]:
-                lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')] = [0, 0, 0]
+                lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get(
+                    'Extended Link TLV')[2].get('Link ID')] = [0, 0, 0]
 
             lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')][0]\
-            = linkstate[i].get('Extended Link TLV')[3].get('Link data')
+                = linkstate[i].get('Extended Link TLV')[3].get('Link data')
 
             if linkstate[i].get('Adj-SID Sub-TLV') is not None:
                 lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')][1]\
-                = linkstate[i].get('Adj-SID Sub-TLV')[4].get('Label')
+                    = linkstate[i].get('Adj-SID Sub-TLV')[4].get('Label')
             else:
                 lsalist[linkstate[i].get('Advertising Router')][1][linkstate[i].get('Extended Link TLV')[2].get('Link ID')][1]\
-                = linkstate[i].get('LAN-Adj-SID Sub-TLV')[5].get('Label')
-
+                    = linkstate[i].get('LAN-Adj-SID Sub-TLV')[5].get('Label')
 
     for i in range(len(linkstate)):
         if linkstate[i].get('Opaque-Type') == 1:
             # Get link information(ID, Bandwidth)
             for j in lsalist[linkstate[i].get('Advertising Router')][1].values():
                 if linkstate[i].get('Local Interface IP Addresses')[0].get('0') == [j][0][0]:
-                    [j][0][2] = linkstate[i].get('Maximum Reservable Bandwidth')
+                    [j][0][2] = linkstate[i].get(
+                        'Maximum Reservable Bandwidth')
 
     return lsalist
 
@@ -65,58 +67,44 @@ def construct_graph(lsalist):
         for j in range(i + 1, len(list_keys)):
             for k in lsalist[list_keys[i]][1]:
                 if k in lsalist[list_keys[j]][1]:
-                    graph.append([list_keys[i], list_keys[j], lsalist[list_keys[i]][1].get(k)[2]])
+                    graph.append([list_keys[i], list_keys[j],
+                                  lsalist[list_keys[i]][1].get(k)[2]])
 
     return graph
 
 
-def dijkstra(src, dst, graph):
-    #     shortest_path = ['192.168.0.2', '192.168.0.3', '192.168.0.4', '192.168.0.5']
-    shortest_path = []
+def with_info_graph(graph, policy):
+    for i in range(len(graph)):
+        graph[i].insert(2, math.ceil(1000000 / graph[i][2]))
+        graph[i].append(policy)
 
-    return shortest_path
+    return graph
 
 
-
-def cspf(src, dst, via, graph, policy):
-    ''''''
-#     close_list = dijkstra(src, dst, graph)
+def cspf_dijkstra(src, dst, via, graph, policy):
+    '''CSPF (constrained dijkstra algorithm)'''
+    close_list = dijkstra(src, dst, graph)
 
     shortest_path = graph
 
     return shortest_path
 
-#
-# def isinclude(population, part):
-#     '''Determine elements are included population'''
-#     ptr = 0
-#     for i in part:
-#         if not i in population[ptr:]:
-#             return False
-#
-#         ptr = population[ptr:].index(i) + 1
-#
-#     return True
-#
 
-def path_verification():
-    pass
+def dijkstra(src, dst, graph):
+    '''general dijkstra algorithm'''
+    shortest_path = []
+
+    return shortest_path
 
 
-def hoge(src, via, graph):
-    '''CSPF (create segmentlist)'''
+def path_verification(src, dst, via, info_graph):
+    '''convert CSPF path to segmentlist'''
 
-    segmentlist = []
-    for i in range(len(via)):
-        path = dijkstra(src, via[i], graph)
-        if not isinclude(path, via[i:]):
-            segmentlist.append(via[i-1])
-            segmentlist.append(
-                create_segmentlist(via[i-1], via[i:], graph)
-            )
-            break
+    constrained_path = cspf_dijkstra(src, dst, via, graph, policy)
+    shortest_path = dijkstra(src, dst, info_graph)
+    print(shortest_path)
 
-    segmentlist.append(via)
+    segmentlist = info_graph
     return segmentlist
 
 
@@ -130,19 +118,19 @@ def create_segmentlist():
     src = '192.168.0.1'
     dst = '192.168.0.5'
     via = ['192.168.0.2', '192.168.0.3', '192.168.0.4', '192.168.0.5']
-    # BW, avoidnode
-    policy = [10, ['192.168.0.2']]
+    # BW, avoidnodes
+    policy = [0, []]
     '''debug'''
 
     # Linkstate list from TED
     lsalist = construct_lsalist(linkstate)
     # Make graph for Dijkstra [nodeA, nodeB, cost, ...]
     graph = construct_graph(lsalist)
-    # Make shortestpath
-    shortest_path = cspf(src, dst, via, graph, policy)
-    print(shortest_path)
+    # Add information in graph
+    info_graph = with_info_graph(graph, policy)
     # Make segmentlist
-#     segmentlist = path_verification(src, via, graph,)
+    segmentlist = path_verification(src, dst, via, info_graph)
+    print(segmentlist)
 
 #     return segmentlist
     return 0
