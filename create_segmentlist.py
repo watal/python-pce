@@ -81,7 +81,7 @@ def with_info_graph(graph, policy):
     return graph
 
 
-def cspf_dijkstra(src, dst, via, info_graph):
+def cspf_dijkstra(src, dst,info_graph):
     '''CSPF (constrained dijkstra algorithm)'''
     close_list = dijkstra(src, dst, info_graph)
 
@@ -97,14 +97,29 @@ def dijkstra(src, dst, graph):
     return shortest_path
 
 
-def path_verification(src, dst, via, info_graph):
+def path_verification(src, via, info_graph, linkstate):
     '''convert CSPF path to segmentlist'''
 
-    constrained_path = cspf_dijkstra(src, dst, via, info_graph)
-    shortest_path = dijkstra(src, dst, info_graph)
+    segmentlist = []
+
+    for i in range(len(via)):
+        # パスを経由ごとに分解し経路計算を行う
+        # 制約付き，制約なしを計算し比較
+        constrained_path = cspf_dijkstra(src, via[i], info_graph)
+        shortest_path = dijkstra(src, [via][i], info_graph)
+        # 制約付き最短経路が最短経路と異なる場合はNode SIDで直接指定不可．迂回路のセグメントリストを構築
+        if constrained_path != shortest_path:
+            # 宛先一つ前までが最短経路かを調べる，1ずつ減らす
+            # 最短が見つかったらそこまでのNode SID 見つからないなら一個前へのAdj SIDをsegmentlistにappend
+            # Nodeがさすところをsrcに買えてもう一度検索
+            # dstまでが最短経路ならそのNodeを加えて終了
+            # src == dstならbreak
+
+        else:
+            # 直接Node SIDを指定
+            segmentlist.append([linkstate[via[i]][0]])
 
     # debug
-    segmentlist = (constrained_path, shortest_path)
     return segmentlist
 
 
@@ -129,7 +144,7 @@ def create_segmentlist():
     # Add information in graph
     info_graph = with_info_graph(graph, policy)
     # Make segmentlist
-    segmentlist = path_verification(src, dst, via, info_graph)
+    segmentlist = path_verification(src, via, info_graph, linkstate)
     print(segmentlist)
 
 #     return segmentlist
