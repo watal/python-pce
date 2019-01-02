@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 
 test_scripts/
+dat/test.json
