@@ -81,13 +81,13 @@ def with_info_graph(graph, policy):
     return graph
 
 
-def cspf_dijkstra(src, dst, via, graph, policy):
+def cspf_dijkstra(src, dst, via, info_graph):
     '''CSPF (constrained dijkstra algorithm)'''
-    close_list = dijkstra(src, dst, graph)
+    close_list = dijkstra(src, dst, info_graph)
 
-    shortest_path = graph
+    constrained_path = info_graph
 
-    return shortest_path
+    return constrained_path
 
 
 def dijkstra(src, dst, graph):
@@ -100,11 +100,11 @@ def dijkstra(src, dst, graph):
 def path_verification(src, dst, via, info_graph):
     '''convert CSPF path to segmentlist'''
 
-    constrained_path = cspf_dijkstra(src, dst, via, graph, policy)
+    constrained_path = cspf_dijkstra(src, dst, via, info_graph)
     shortest_path = dijkstra(src, dst, info_graph)
-    print(shortest_path)
 
-    segmentlist = info_graph
+    # debug
+    segmentlist = (constrained_path, shortest_path)
     return segmentlist
 
 
