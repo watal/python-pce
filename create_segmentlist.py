@@ -90,7 +90,7 @@ def cspf_dijkstra(src, dst, graph, policy):
     # create directed graph
     for i in range(len(graph)):
         # BW constrain and avoid node
-        if graph[i][3] >= policy[0] and set([graph[i][0], graph[i][1]]) & set(policy[1]) == set():
+        if graph[i][3] >= policy['bandwidth'] and set([graph[i][0], graph[i][1]]) & set(policy['avoid_nodes']) == set():
             directed_graph[graph[i][0]].append((graph[i][2], graph[i][1]))
 
     # queue, closedlist
@@ -216,19 +216,18 @@ def path_verification(src, via, info_graph, policy, lsalist):
     return nexthop, segmentlist_stack
 
 
-# def create_segmentlist(src, dst, via, policy, linkstate)
-def create_segmentlist():
+def create_segmentlist(src, dst, via, policy, linkstate):
     '''create segmentlist'''
 
-    '''debug'''
-    with open('dat/ted.json', 'r') as f:
-        linkstate = json.load(f)
-    src = '192.168.0.1'
-    dst = '192.168.0.4'
-    via = ['192.168.0.2', '192.168.0.3', '192.168.0.4']
-    # BW, avoidnodes
-    policy = [0, ['192.168.0.3']]
-    '''debug'''
+#     '''debug'''
+#     with open('dat/ted.json', 'r') as f:
+#         linkstate = json.load(f)
+#     src = '192.168.0.1'
+#     dst = '192.168.0.4'
+#     via = ['192.168.0.2', '192.168.0.3', '192.168.0.4']
+#     BW, avoidnodes
+#     policy = {'bandwidth': 0, 'avoid_nodes': ['192.168.0.5']}
+#     '''debug'''
 
     # Linkstate list from TED
     lsalist = construct_lsalist(linkstate)
@@ -242,8 +241,8 @@ def create_segmentlist():
 #     print('Router Info: {}\n'.format(lsalist))
     print('Topology: {}'.format(graph))
     print('Policy:')
-    print('\tQoS (Minimum BandWidth): {}'.format(policy[0]))
-    print('\tAvoid Node: {}'.format(policy[1]))
+    print('\tQoS (Minimum BandWidth): {}'.format(policy['bandwidth']))
+    print('\tAvoid Node: {}'.format(policy['avoid_nodes']))
     print('Src: {}'.format(src))
     print('Dst: {}'.format(dst))
     print('Via: {}\n'.format(via))
@@ -253,3 +252,7 @@ def create_segmentlist():
 
     sl_info = {'src':src ,'dst':dst ,'nexthop': nexthop,'segmentlist': segmentlist_stack}
     return (sl_info)
+
+
+if __name__ == '__main__':
+    create_segmentlist()

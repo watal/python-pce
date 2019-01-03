@@ -3,7 +3,7 @@
 
 import json
 import yaml
-import create_sl_info
+import create_segmentlist
 import segmentlist_sockcli
 
 
@@ -20,7 +20,7 @@ def get_policy(src):
     '''Open Policy file'''
 
     with open('config/policy.yaml', 'w') as f:
-        policies = yaml.loads(f)
+        policies = yaml.load(f)
 
     return policies['src']
 
@@ -28,9 +28,9 @@ def get_policy(src):
 def create_sl_info(src, policy_info, linkstate):
     '''Constrained Shortest Path First'''
 
-    dst = policy_info[0]
-    via = policy_info[1]
-    policy = policy_info[2]
+    dst = policy_info['dst']
+    via = policy_info['via']
+    policy = policy_info['policy']
     sl_info = create_segmentlist(src, dst, via, policy, linkstate)
 
     return sl_info
@@ -41,12 +41,12 @@ def manager(src):
 
     linkstate = get_linkstate(src)
     policies = get_policy(src)
-    for policy_info range(len(policies)):
+    for policy_info in range(len(policies)):
         # list of src, dst, nexthop, segmentlist
-        sl_info = create_sl_info(src, policy_info, linkstate):
-            # Can't create policy-based path
-            if sl_info['segmentlist'] == 'Unreachable':
-                return -1
+        sl_info = create_sl_info(src, policy_info, linkstate)
+        # Can't create policy-based path
+        if sl_info['segmentlist'] == 'Unreachable':
+            return -1
         segmentlist_sockcli.ssocket(sl_info)
 
     return
