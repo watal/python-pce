@@ -11,9 +11,8 @@ class ServAttr:
         self.port = 0
 
 
-def ssocket(sl_info):
+def ssocket(addr, sl_info):
     '''socket of segmentlist'''
-    addr = sl_info[1]
     serv = ServAttr()
     serv.ip = addr
     serv.port = 55384

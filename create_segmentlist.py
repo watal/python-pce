@@ -78,7 +78,7 @@ def construct_graph(lsalist):
 def with_info_graph(graph):
     for i in range(len(graph)):
         graph[i].insert(2, math.ceil(1000000 / graph[i][2]))
-
+	print(graph)
     return graph
 
 
@@ -216,18 +216,8 @@ def path_verification(src, via, info_graph, policy, lsalist):
     return nexthop, segmentlist_stack
 
 
-def create_segmentlist(src, dst, via, policy, linkstate):
+def create_sl(src, dst, via, policy, linkstate):
     '''create segmentlist'''
-
-#     '''debug'''
-#     with open('dat/ted.json', 'r') as f:
-#         linkstate = json.load(f)
-#     src = '192.168.0.1'
-#     dst = '192.168.0.4'
-#     via = ['192.168.0.2', '192.168.0.3', '192.168.0.4']
-#     BW, avoidnodes
-#     policy = {'bandwidth': 0, 'avoid_nodes': ['192.168.0.5']}
-#     '''debug'''
 
     # Linkstate list from TED
     lsalist = construct_lsalist(linkstate)
