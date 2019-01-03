@@ -250,12 +250,6 @@ def create_segmentlist():
     print('-> Next Hop P2P Addr: {}'.format(nexthop))
     print('   Segment List: {}'.format(segmentlist_stack))
 
-#     return (src, dst, nexthop, segmentlist)
 
     sl_info = {'src':src ,'dst':dst ,'nexthop': nexthop,'segmentlist': segmentlist_stack}
-    print(sl_info)
-    return
-
-
-if __name__ == '__main__':
-    create_segmentlist()
+    return (sl_info)
