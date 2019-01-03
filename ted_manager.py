@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import path_compute
+import pathcompute_manager
 
 
 def check_ted(linkstate, addr):
@@ -31,6 +31,6 @@ def manager(addr, linkstate):
     ret = check_ted(linkstate, addr)
     if ret != 0:
         update_ted(linkstate, ted);
-        path_compute.compute(addr)
+        pathcompute_manager.manager(addr)
 
     return

@@ -11,15 +11,17 @@ class ServAttr:
         self.port = 0
 
 
-def ssocket(addr, segment_lists):
+def ssocket(sl_info):
     '''socket of segmentlist'''
+    addr = sl_info[1]
     serv = ServAttr()
     serv.ip = addr
     serv.port = 55384
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((serv.ip, serv.port))
-    s.send(json.dumps(segment_lists))
+    # send segmentlist infomation (src, dst, nexthop, segmentlist)
+    s.send(json.dumps(sl_info))
     s.close()
 
     return
