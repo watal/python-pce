@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import threading
 import linkstate_socksrv
+import segmentlist_socksrv
 
 
 def main():
     '''simple PCE for FRRouting'''
 
-    linkstate_socksrv.lsocket()
+    # Receive linkstate
+    thread_ls = threading.Thread(target=linkstate_socksrv.lsocket)
+    # Receive segment list
+    thread_sl = threading.Thread(target=segmentlist_socksrv.ssocket)
+
+    thread_ls.start()
+    thread_sl.start()
 
     return 0
 
