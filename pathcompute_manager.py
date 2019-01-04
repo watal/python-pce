@@ -7,11 +7,16 @@ import create_segmentlist
 import segmentlist_sockcli
 
 
+def ascii_encode_dict(data):
+    ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
+    return dict(map(ascii_encode, pair) for pair in data.items())
+
+
 def get_linkstate(src):
     '''Linkstate from TED'''
 
     with open('dat/ted.json', 'r') as f:
-        ted = json.load(f)
+        ted = json.load(f, object_hook=ascii_encode_dict)
 
     return ted[src]
 
@@ -48,6 +53,7 @@ def manager(src):
         # Can't create policy-based path
         if sl_info['segmentlist'] == 'Unreachable':
             return -1
+        print('src: {}'.format(src))
         segmentlist_sockcli.ssocket(src, sl_info)
 
     return

@@ -78,7 +78,6 @@ def construct_graph(lsalist):
 def with_info_graph(graph):
     for i in range(len(graph)):
         graph[i].insert(2, math.ceil(1000000 / graph[i][2]))
-	print(graph)
     return graph
 
 
@@ -92,6 +91,7 @@ def cspf_dijkstra(src, dst, graph, policy):
         # BW constrain and avoid node
         if graph[i][3] >= policy['bandwidth'] and set([graph[i][0], graph[i][1]]) & set(policy['avoid_nodes']) == set():
             directed_graph[graph[i][0]].append((graph[i][2], graph[i][1]))
+            directed_graph[graph[i][1]].append((graph[i][2], graph[i][0]))
 
     # queue, closedlist
     q, seen = [(0, src, ())], set()
@@ -123,6 +123,7 @@ def dijkstra(src, dst, graph):
     # create directed graph
     for i in range(len(graph)):
         directed_graph[graph[i][0]].append((graph[i][2], graph[i][1]))
+        directed_graph[graph[i][1]].append((graph[i][2], graph[i][0]))
 
     # queue, closedlist
     q, seen = [(0, src, ())], set()
@@ -208,9 +209,9 @@ def path_verification(src, via, info_graph, policy, lsalist):
 
     # convert segmentlist format [16000, 16001] to '16000/16001'
     segmentlist_stack = ''
-    for i in range(len(segmentlist)):
-        segmentlist_stack += str(segmentlist[i])
-        if i+1 != len(segmentlist):
+    for i in range(len(segmentlist)-1):
+        segmentlist_stack += str(segmentlist[i+1])
+        if i+1 != len(segmentlist)-1:
             segmentlist_stack += '/'
 
     return nexthop, segmentlist_stack
