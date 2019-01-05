@@ -33,10 +33,7 @@ def update_ted(linkstate, addr):
 
 def manager(addr, linkstate):
     '''main of TED manager'''
-    # fork (Hierarchical SR-PCE)
-    # ChildProcess: Call linkstate_sockcli
 
-    # ParentProcess: Recode linkstate to TED
     ret = check_ted(linkstate, addr)
     if ret != 0:
         update_ted(linkstate, addr);

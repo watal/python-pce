@@ -5,7 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import socket
-import pickle 
+import pickle
 import ted_manager
 
 BUFSIZE = 4096
@@ -21,7 +21,7 @@ def lsocket():
     '''Socket of linkstate'''
 
     serv = ServAttr()
-    serv.ip = '172.16.1.254'
+    serv.ip = '172.16.2.253'
     serv.port = 17932
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,7 +36,8 @@ def lsocket():
         if pid == 0:
             # child process
             s.close()
-            print('[Link State] Get linkstate information from {}'.format(addr[0]), file=sys.stderr)
+            print('[Link State] Get linkstate information from {}'.format(
+                addr[0]), file=sys.stderr)
             while True:
                 data = conn.recv(BUFSIZE)
                 if not data:

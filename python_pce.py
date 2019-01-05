@@ -4,6 +4,7 @@
 import threading
 import linkstate_socksrv
 import segmentlist_socksrv
+import argparse
 
 
 def main():
@@ -21,4 +22,8 @@ def main():
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Simple SR PCE')
+    args = parser.parse_args()
+
     main()

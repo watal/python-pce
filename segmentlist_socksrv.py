@@ -5,7 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import socket
-import pickle 
+import pickle
 import compute_manager
 
 BUFSIZE = 4096
@@ -21,7 +21,7 @@ def ssocket():
     '''Socket of segmentlist'''
 
     serv = ServAttr()
-    serv.ip = '172.16.1.254'
+    serv.ip = '172.16.2.253'
     serv.port = 55384
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,12 +35,14 @@ def ssocket():
         if pid == 0:
             # child process
             s.close()
-            print('[Segment list] Get path-computation request from {}'.format(addr[0]), file=sys.stderr)
+            print(
+                '[Segment list] Get path-computation request from {}'.format(addr[0]), file=sys.stderr)
             request = conn.recv(BUFSIZE)
             # send segmentlist infomation (src, dst, nexthop, segmentlist)
             print('[Segment list] Start create sl_info')
             sl_info = compute_manager.manager(pickle.loads(request))
-            print('[Segment list] Send sl_info: {} To {}'.format(sl_info, addr[0]), file=sys.stderr)
+            print('[Segment list] Send sl_info: {} To {}'.format(
+                sl_info, addr[0]), file=sys.stderr)
             conn.send(pickle.dumps(sl_info))
             conn.close()
             sys.exit()

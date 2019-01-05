@@ -102,7 +102,7 @@ def cspf_dijkstra(src, dst, graph, policy):
             path = (v1, path)
             # clean output
             if v1 == dst:
-                stack=[]
+                stack = []
                 while len(path) > 1:
                     stack.insert(0, path[0])
                     path = path[1]
@@ -134,7 +134,7 @@ def dijkstra(src, dst, graph):
             path = (v1, path)
             # clean output to stack
             if v1 == dst:
-                stack=[]
+                stack = []
                 while len(path) > 1:
                     stack.insert(0, path[0])
                     path = path[1]
@@ -161,7 +161,8 @@ def retour(src, dst, info_graph, constrained_path, lsalist):
             # 中間ノードから先が最短経路と一致しないなら
             if constrained_path[-(i+1):] != dijkstra(constrained_path[-(i+1)], dst, info_graph):
                 # 中間ノードをsrcに変えてもう一度検索
-                retour_list.append(retour(constrained_path[-(i+1)], dst, info_graph. constrained_path[-(i+1):], lsalist))
+                retour_list.append(retour(
+                    constrained_path[-(i+1)], dst, info_graph. constrained_path[-(i+1):], lsalist))
 
             else:
                 # dstまでが最短経路なら宛先のNode SIDを加えて終了
@@ -173,9 +174,11 @@ def retour(src, dst, info_graph, constrained_path, lsalist):
     # 隣接ノードがdstでないならば
     if constrained_path[1] != dst:
         # 一つ先からもう一度検索
-        retour_list.append(retour(constrained_path[i], dst, info_graph. constrained_path[1:], lsalist))
+        retour_list.append(
+            retour(constrained_path[i], dst, info_graph. constrained_path[1:], lsalist))
 
     return retour_list
+
 
 def path_verification(src, via, info_graph, policy, lsalist):
     '''convert CSPF path to segmentlist'''
@@ -202,7 +205,8 @@ def path_verification(src, via, info_graph, policy, lsalist):
         # 制約付き最短経路が最短経路と異なる場合はNode SIDで直接指定不可
         if constrained_path != shortest_path:
             # 迂回路のセグメントリストを構築し追記
-            segmentlist += retour(src, via[i], info_graph, constrained_path, lsalist)
+            segmentlist += retour(src, via[i],
+                                  info_graph, constrained_path, lsalist)
         else:
             # 直接Node SIDを追加
             print('[Segment list] Add Node SID: {}'.format(lsalist[via[i]][0]))
@@ -229,7 +233,8 @@ def create_sl(src, dst, via, policy, linkstate):
     # Add information in graph
     info_graph = with_info_graph(graph)
     # Make segmentlist
-    nexthop, segmentlist_stack = path_verification(src, via, info_graph, policy, lsalist)
+    nexthop, segmentlist_stack = path_verification(
+        src, via, info_graph, policy, lsalist)
 
 #     print('Router Info: {}\n'.format(lsalist))
     print('Topology: {}'.format(graph))
@@ -242,8 +247,8 @@ def create_sl(src, dst, via, policy, linkstate):
     print('-> Next Hop P2P Addr: {}'.format(nexthop))
     print('   Segment List: {}'.format(segmentlist_stack))
 
-
-    sl_info = {'src':src ,'dst':dst ,'nexthop': nexthop,'segmentlist': segmentlist_stack}
+    sl_info = {'src': src, 'dst': dst, 'nexthop': nexthop,
+               'segmentlist': segmentlist_stack}
     return (sl_info)
 
 
