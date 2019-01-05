@@ -27,13 +27,14 @@ def get_policy(src, dst):
     with open('config/policy.yaml', 'r') as f:
         policies = yaml.load(f)
 
-    # get constrain of src to dst
-    constrain = policies[src][dst]
-    if constrain == '':
-        # If policy undefined, return void policy
-        return {'via': [''], 'policy': {'bandwidth': 0, 'avoid_nodes': ['']}}
-    else:
-        return constrain
+    if src in policies:
+        if dst in policies[src]:
+            # get constrain of src to dst
+            constrain = policies[src][dst]
+            return constrain
+
+    # If policy undefined, return void policy
+    return {'via': [dst], 'policy': {'bandwidth': 0, 'avoid_nodes': ['']}}
 
 def create_sl_info(request, constrain, linkstate):
     '''Constrained Shortest Path First'''

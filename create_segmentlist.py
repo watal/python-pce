@@ -153,27 +153,27 @@ def retour(src, dst, info_graph, constrained_path, lsalist):
 
     retour_list = []
 
-    for i in range(len(constrained_path)):
+    for i in range(1, len(constrained_path)):
         # 宛先よりiノード前までが最短経路かを調べる
-        if constrained_path[:i] == dijkstra(src, constrained_path[j], info_graph):
-            # 最短が見つかったらそこまでのNode SIDをappend
-            segmentlist.append(lsalist[retour_path[:i]])
+        if constrained_path[:-i] == dijkstra(src, constrained_path[-(i+1)], info_graph):
+            # 最短が見つかったらそのNode SIDをappend
+            retour_list.append(lsalist[constrained_path[-(i+1)]][0])
             # 中間ノードから先が最短経路と一致しないなら
-            if constrained_path[:i] != dijkstra(src, constrained_path[j], info_graph):
+            if constrained_path[-(i+1):] != dijkstra(constrained_path[-(i+1)], dst, info_graph):
                 # 中間ノードをsrcに変えてもう一度検索
-                segmentlist.append(retour(constrained_path[i], dst, info_graph. constrained_path[i:]))
+                retour_list.append(retour(constrained_path[-(i+1)], dst, info_graph. constrained_path[-(i+1):], lsalist))
 
             else:
-                # dstまでが最短経路ならそのNodeを加えて終了
-                segmentlist.append(lsalist[constrained_path[i]][0])
+                # dstまでが最短経路なら宛先のNode SIDを加えて終了
+                retour_list.append(lsalist[constrained_path[-1]][0])
                 return retour_list
 
     # 一個前でも最短経路でないならば，そこへのAdj SIDをsegmentlistにappend
-    segmentlist.append(lsalist[src][2][constrained_path[1]])
+    retour_list.append(lsalist[src][2][constrained_path[1]])
     # 隣接ノードがdstでないならば
     if constrained_path[1] != dst:
         # 一つ先からもう一度検索
-        segmentlist.append(retour(constrained_path[i], dst, info_graph. constrained_path[1:], lsalist))
+        retour_list.append(retour(constrained_path[i], dst, info_graph. constrained_path[1:], lsalist))
 
     return retour_list
 
@@ -202,16 +202,18 @@ def path_verification(src, via, info_graph, policy, lsalist):
         # 制約付き最短経路が最短経路と異なる場合はNode SIDで直接指定不可
         if constrained_path != shortest_path:
             # 迂回路のセグメントリストを構築し追記
-            segmentlist.append(retour(src, via[i], info_graph, constrained_path, lsalist))
+            segmentlist += retour(src, via[i], info_graph, constrained_path, lsalist)
         else:
             # 直接Node SIDを追加
+            print('[Segment list] Add Node SID: {}'.format(lsalist[via[i]][0]))
             segmentlist.append(lsalist[via[i]][0])
 
     # convert segmentlist format [16000, 16001] to '16000/16001'
     segmentlist_stack = ''
-    for i in range(len(segmentlist)-1):
-        segmentlist_stack += str(segmentlist[i+1])
-        if i+1 != len(segmentlist)-1:
+    print('segmentlist: {}'.format(segmentlist))
+    for i in range(len(segmentlist)):
+        segmentlist_stack += str(segmentlist[i])
+        if i != len(segmentlist)-1:
             segmentlist_stack += '/'
 
     return nexthop, segmentlist_stack
